@@ -14,7 +14,9 @@ type KeyRequestBody struct {
 }
 
 type KeyResponse struct {
-	Phrase string `json:"phrase"`
+	// Phrase string `json:"phrase"`
+	PrivateKey string `json:"privateKey"`
+	PublicKey  string `json:"publicKey"`
 }
 
 func hashFunction(text string) string {
@@ -42,12 +44,22 @@ func GeneratePhrase(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(privateKey)
-	fmt.Println(publicKey)
+	privateKeyPEM := keys.PrivateKeyToPEM(privateKey)
+	publicKeyPEM := keys.PublicKeyToPEM(publicKey)
+
+	fmt.Println(privateKeyPEM)
+	fmt.Println(publicKeyPEM)
 
 	fmt.Println(requestBody.Name)
 	fmt.Println(requestBody.Email)
 
 	fmt.Println(hashFunction(requestBody.Name))
 	fmt.Println(hashFunction(requestBody.Email))
+
+	responseBody := KeyResponse{
+		PrivateKey: privateKeyPEM,
+		PublicKey: publicKeyPEM,
+	}
+
+	writeJSONResponse(w, http.StatusOK, responseBody)
 }
