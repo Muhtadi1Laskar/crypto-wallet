@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto-wallet/handlers"
 	"fmt"
 	"net/http"
 )
@@ -21,5 +22,9 @@ func enableCORS(h http.Handler) http.Handler {
 }
 
 func main() {
-	fmt.Println("Hello World")
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/generatePhrase", handlers.GeneratePhrase)
+	fmt.Println("Server running on 5000")
+	http.ListenAndServe(":5000", enableCORS(mux))
 }

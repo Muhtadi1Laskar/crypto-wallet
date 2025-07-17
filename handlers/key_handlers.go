@@ -23,5 +23,5 @@ func GeneratePhrase(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println(requestBody.Name)
-	fmt.Println(requestBody.Name)
+	fmt.Println(requestBody.Email)
 }
