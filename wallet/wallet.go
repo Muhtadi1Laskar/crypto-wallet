@@ -2,7 +2,7 @@ package wallet
 
 import (
 	crypto "crypto-wallet/crypto"
-	"fmt"
+	"encoding/hex"
 	"strings"
 )
 
@@ -19,6 +19,11 @@ type WalletKeys struct {
 	PrivateKey []byte
 }
 
+type RetriveWalletInfo struct {
+	Address    string
+	PublicKey  string
+	PrivateKey string
+}
 
 func GeneratePhrases() ([]string, error) {
 	mnemonic, err := crypto.GeneratePhrase()
@@ -39,13 +44,12 @@ func CreateNewWallet(password string) *NewWalletBody {
 	encryptedPrivateKey, _ := crypto.AESEncrypt(string(keys.PrivateKey), aesKey)
 
 	return &NewWalletBody{
-		Phrase: mnemonicStr,
-		Address: keys.Address,
-		EncryptedMnemonic: encryptedMnemonic,
+		Phrase:              mnemonicStr,
+		Address:             keys.Address,
+		EncryptedMnemonic:   encryptedMnemonic,
 		EncryptedPrivateKey: encryptedPrivateKey,
 	}
 }
-
 
 func GenerateKeysFromPhrase(phrase, password string) *WalletKeys {
 	var seed []byte = crypto.GenerateSeed(phrase, password)
@@ -63,9 +67,15 @@ func GenerateKeysFromPhrase(phrase, password string) *WalletKeys {
 	}
 }
 
-func RetriveExistingWallet(password, encryptedPhrase string) {
+func RetriveExistingWallet(password, encryptedPhrase string) *RetriveWalletInfo {
 	aesKey := crypto.DeriveAESKey(password)
 	mnemonic, _ := crypto.AESDecrypt(encryptedPhrase, aesKey)
 
-	fmt.Println(mnemonic)
+	keys := GenerateKeysFromPhrase(mnemonic, password)
+
+	return &RetriveWalletInfo{
+		Address:    keys.Address,
+		PublicKey:  hex.EncodeToString(keys.PublicKey),
+		PrivateKey: hex.EncodeToString(keys.PrivateKey),
+	}
 }

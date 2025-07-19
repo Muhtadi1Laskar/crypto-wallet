@@ -10,6 +10,12 @@ type LoginRequestBody struct {
 	EncryptedMnemonic string `json:"encryptedMnemonic" validate:"required"`
 }
 
+type LoginResponseBody struct {
+	Address    string `json:"address"`
+	PublicKey  string `json:"publicKey"`
+	PrivateKey string `json:"privateKey"`
+}
+
 func Login(w http.ResponseWriter, r *http.Request) {
 	var requestBody LoginRequestBody
 
@@ -17,5 +23,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	wallet.RetriveExistingWallet(requestBody.Password, requestBody.EncryptedMnemonic)
+	data := wallet.RetriveExistingWallet(requestBody.Password, requestBody.EncryptedMnemonic)
+
+	responseBody := LoginResponseBody{
+		Address:    data.Address,
+		PublicKey:  data.PublicKey,
+		PrivateKey: data.PrivateKey,
+	}
+
+	writeJSONResponse(w, http.StatusOK, responseBody)
 }
