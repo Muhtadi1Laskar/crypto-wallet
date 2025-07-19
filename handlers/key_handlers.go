@@ -1,11 +1,9 @@
 package handlers
 
 import (
-	crypto "crypto-wallet/crypto"
-	"encoding/hex"
+	"crypto-wallet/wallet"
 	"fmt"
 	"net/http"
-	"strings"
 )
 
 type SignUpRequestBody struct {
@@ -15,7 +13,9 @@ type SignUpRequestBody struct {
 
 type PhraseResponse struct {
 	Phrase string `json:"phrase"`
-	Seed string `json:"seed"`
+	Address string `json:"address"`
+	EncryptedMnemonic string `json:"encryptedMnemonic"`
+	EncryptedPrivateKey string `json:"encryptedPrivateKey"`
 }
 
 func GeneratePhrase(w http.ResponseWriter, r *http.Request) {
@@ -29,16 +29,13 @@ func GeneratePhrase(w http.ResponseWriter, r *http.Request) {
 	var password string = requestBody.Password
 	fmt.Println(password)
 
-	mnemonic, err := crypto.GeneratePhrase()
-	if err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
-	}
-	mnemonicStr := strings.Join(mnemonic, " ")
-	seed := crypto.GenerateSeed(mnemonicStr, password)
+	data := wallet.CreateNewWallet(password)
 
 	responseBody := PhraseResponse{
-		Phrase: mnemonicStr,
-		Seed: hex.EncodeToString(seed),
+		Phrase: data.Phrase,
+		Address: data.Address,
+		EncryptedMnemonic: data.EncryptedMnemonic,
+		EncryptedPrivateKey: data.EncryptedPrivateKey,
 	}
 
 	writeJSONResponse(w, http.StatusOK, responseBody)
