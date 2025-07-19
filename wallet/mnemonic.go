@@ -1,6 +1,7 @@
 package wallet
 
 import (
+	"crypto/rand"
 	"fmt"
 	"os"
 	"strings"
@@ -32,4 +33,13 @@ func bytesToBits(data []byte) []byte {
 
 func bitToChar(b byte) byte {
 	return '0' + (b & 1)
+}
+
+func generateEntropy() ([]byte, error) {
+	entropy := make([]byte, 16)
+	_, err := rand.Read(entropy)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate entropy: %v", err)
+	}
+	return entropy, nil
 }
