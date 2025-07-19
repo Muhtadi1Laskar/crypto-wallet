@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	wallet "crypto-wallet/crypto"
+	crypto "crypto-wallet/crypto"
 	"encoding/hex"
 	"fmt"
 	"net/http"
@@ -29,12 +29,12 @@ func GeneratePhrase(w http.ResponseWriter, r *http.Request) {
 	var password string = requestBody.Password
 	fmt.Println(password)
 
-	mnemonic, err := wallet.GeneratePhrase()
+	mnemonic, err := crypto.GeneratePhrase()
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
 	}
 	mnemonicStr := strings.Join(mnemonic, " ")
-	seed := wallet.GenerateSeed(mnemonicStr, password)
+	seed := crypto.GenerateSeed(mnemonicStr, password)
 
 	responseBody := PhraseResponse{
 		Phrase: mnemonicStr,
