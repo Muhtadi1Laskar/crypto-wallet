@@ -2,8 +2,8 @@ package wallet
 
 import (
 	crypto "crypto-wallet/crypto"
+	"fmt"
 	"strings"
-
 )
 
 type NewWalletBody struct {
@@ -61,4 +61,11 @@ func GenerateKeysFromPhrase(phrase, password string) *WalletKeys {
 		PublicKey:  publicKey,
 		PrivateKey: childKey,
 	}
+}
+
+func RetriveExistingWallet(password, encryptedPhrase string) {
+	aesKey := crypto.DeriveAESKey(password)
+	mnemonic, _ := crypto.AESDecrypt(encryptedPhrase, aesKey)
+
+	fmt.Println(mnemonic)
 }

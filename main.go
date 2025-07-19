@@ -25,6 +25,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/register", handlers.Register)
+	mux.HandleFunc("/login", handlers.Login)
 	fmt.Println("Server running on 5000")
 	http.ListenAndServe(":5000", enableCORS(mux))
 }
