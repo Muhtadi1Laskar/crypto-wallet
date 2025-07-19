@@ -1,65 +1,43 @@
 package handlers
 
 import (
-	keys "crypto-wallet/Keys"
-	"crypto/sha256"
-	"encoding/hex"
+	"crypto-wallet/wallet"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
-type KeyRequestBody struct {
+type SignUpRequestBody struct {
 	Name  string `json:"name" validate:"required"`
-	Email string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
-type KeyResponse struct {
-	// Phrase string `json:"phrase"`
-	PrivateKey string `json:"privateKey"`
-	PublicKey  string `json:"publicKey"`
-}
-
-func hashFunction(text string) string {
-	byteMessage := []byte(text)
-	hash := sha256.New()
-	hash.Write(byteMessage)
-
-	hashedBytes := hash.Sum(nil)
-	encodedStr := hex.EncodeToString(hashedBytes)
-
-	return encodedStr
+type PhraseResponse struct {
+	Phrase string `json:"phrase"`
 }
 
 func GeneratePhrase(w http.ResponseWriter, r *http.Request) {
-	var requestBody KeyRequestBody
+	var requestBody SignUpRequestBody
 
 	if err := readRequestBody(r, &requestBody); err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	privateKey, publicKey, err := keys.GenerateKeys()
+	var password string = requestBody.Password
+	fmt.Println(password)
+
+	mnemonic, err := wallet.GeneratePhrase()
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
-		return
 	}
+	mnemonicStr := strings.Join(mnemonic, " ")
+	fmt.Println(mnemonic)
 
-	privateKeyPEM := keys.PrivateKeyToPEM(privateKey)
-	publicKeyPEM := keys.PublicKeyToPEM(publicKey)
-
-	fmt.Println(privateKeyPEM)
-	fmt.Println(publicKeyPEM)
-
-	fmt.Println(requestBody.Name)
-	fmt.Println(requestBody.Email)
-
-	fmt.Println(hashFunction(requestBody.Name))
-	fmt.Println(hashFunction(requestBody.Email))
-
-	responseBody := KeyResponse{
-		PrivateKey: privateKeyPEM,
-		PublicKey: publicKeyPEM,
+	responseBody := PhraseResponse{
+		Phrase: mnemonicStr,
 	}
 
 	writeJSONResponse(w, http.StatusOK, responseBody)
 }
+

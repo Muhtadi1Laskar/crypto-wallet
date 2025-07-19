@@ -5,9 +5,17 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 )
+
+func getTxtFilePath() string {
+	_, filename, _, _ := runtime.Caller(0)
+	dir := filepath.Dir(filename)
+	return filepath.Join(dir, "../Data/bip-39-words.txt")
+}
 
 func readWordList(filPath string) ([]string, error) {
 	data, err := os.ReadFile(filPath)
@@ -19,7 +27,7 @@ func readWordList(filPath string) ([]string, error) {
 }
 
 func bytesToBits(data []byte) string {
-	bits := make([]byte, 0, len(data) * 8)
+	bits := make([]byte, 0, len(data)*8)
 	for _, b := range data {
 		bits = append(bits, bitToChar(b>>7))
 		bits = append(bits, bitToChar(b>>6))
@@ -46,7 +54,8 @@ func generateEntropy() ([]byte, error) {
 	return entropy, nil
 }
 
-func GeneratePhrase(filePath string) ([]string, error) {
+func GeneratePhrase() ([]string, error) {
+	filePath := getTxtFilePath()
 	wordList, err := readWordList(filePath)
 	if err != nil {
 		return nil, err
@@ -62,7 +71,7 @@ func GeneratePhrase(filePath string) ([]string, error) {
 	fullBits := entropyBits + checkSum
 
 	var mnemonic []string
-	for i := 0; i < len(fullBits); i++ {
+	for i := 0; i < len(fullBits); i += 11 {
 		chunk := fullBits[i : i+11]
 		index, err := strconv.ParseInt(chunk, 2, 64)
 		if err != nil {
