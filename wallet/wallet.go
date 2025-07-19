@@ -25,6 +25,13 @@ type RetriveWalletInfo struct {
 	PrivateKey string
 }
 
+type ImportWalletInfo struct {
+	Address    string
+	PublicKey  string
+	PrivateKey string
+}
+
+
 func GeneratePhrases() ([]string, error) {
 	mnemonic, err := crypto.GeneratePhrase()
 	if err != nil {
@@ -97,6 +104,19 @@ func RetriveExistingWallet(password, encryptedPhrase string) (*RetriveWalletInfo
 	}
 
 	return &RetriveWalletInfo{
+		Address:    keys.Address,
+		PublicKey:  hex.EncodeToString(keys.PublicKey),
+		PrivateKey: hex.EncodeToString(keys.PrivateKey),
+	}, nil
+}
+
+func ImportWallet(phrase, password string) (*ImportWalletInfo, error) {
+	keys, err := GenerateKeysFromPhrase(phrase, password)
+	if err != nil {
+		return  nil, err
+	}
+
+	return &ImportWalletInfo{
 		Address:    keys.Address,
 		PublicKey:  hex.EncodeToString(keys.PublicKey),
 		PrivateKey: hex.EncodeToString(keys.PrivateKey),

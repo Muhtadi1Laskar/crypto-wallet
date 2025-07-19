@@ -26,6 +26,7 @@ func main() {
 
 	mux.HandleFunc("/register", handlers.Register)
 	mux.HandleFunc("/login", handlers.Login)
+	mux.HandleFunc("/import", handlers.ImportHandlers)
 	fmt.Println("Server running on 5000")
 	http.ListenAndServe(":5000", enableCORS(mux))
 }
