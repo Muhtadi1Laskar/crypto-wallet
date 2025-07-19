@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"crypto-wallet/wallet"
+	wallet "crypto-wallet/crypto"
 	"fmt"
 	"net/http"
 	"strings"
@@ -26,7 +26,7 @@ func GeneratePhrase(w http.ResponseWriter, r *http.Request) {
 
 	var password string = requestBody.Password
 	fmt.Println(password)
-
+	
 	mnemonic, err := wallet.GeneratePhrase()
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
