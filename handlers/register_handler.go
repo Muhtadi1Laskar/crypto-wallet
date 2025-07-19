@@ -29,7 +29,11 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	var password string = requestBody.Password
 	fmt.Println(password)
 
-	data := wallet.CreateNewWallet(password)
+	data, err := wallet.CreateNewWallet(password)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	responseBody := PhraseResponse{
 		Phrase: data.Phrase,

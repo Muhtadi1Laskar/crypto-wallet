@@ -23,7 +23,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	data := wallet.RetriveExistingWallet(requestBody.Password, requestBody.EncryptedMnemonic)
+	data, err := wallet.RetriveExistingWallet(requestBody.Password, requestBody.EncryptedMnemonic)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	responseBody := LoginResponseBody{
 		Address:    data.Address,
