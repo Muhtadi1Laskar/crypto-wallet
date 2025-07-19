@@ -2,8 +2,10 @@ package wallet
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -16,7 +18,7 @@ func readWordList(filPath string) ([]string, error) {
 	return lines, nil
 }
 
-func bytesToBits(data []byte) []byte {
+func bytesToBits(data []byte) string {
 	bits := make([]byte, 0, len(data) * 8)
 	for _, b := range data {
 		bits = append(bits, bitToChar(b>>7))
@@ -28,7 +30,7 @@ func bytesToBits(data []byte) []byte {
 		bits = append(bits, bitToChar(b>>1))
 		bits = append(bits, bitToChar(b))
 	}
-	return bits
+	return string(bits)
 }
 
 func bitToChar(b byte) byte {
@@ -42,4 +44,31 @@ func generateEntropy() ([]byte, error) {
 		return nil, fmt.Errorf("failed to generate entropy: %v", err)
 	}
 	return entropy, nil
+}
+
+func GeneratePhrase(filePath string) ([]string, error) {
+	wordList, err := readWordList(filePath)
+	if err != nil {
+		return nil, err
+	}
+	entropy, err := generateEntropy()
+	if err != nil {
+		return nil, err
+	}
+	hash := sha256.Sum256(entropy)
+	entropyBits := bytesToBits(entropy)
+	checkSum := bytesToBits([]byte{hash[0]})[:4]
+
+	fullBits := entropyBits + checkSum
+
+	var mnemonic []string
+	for i := 0; i < len(fullBits); i++ {
+		chunk := fullBits[i : i+11]
+		index, err := strconv.ParseInt(chunk, 2, 64)
+		if err != nil {
+			return nil, err
+		}
+		mnemonic = append(mnemonic, wordList[index])
+	}
+	return mnemonic, nil
 }
