@@ -18,7 +18,7 @@ type PhraseResponse struct {
 	EncryptedPrivateKey string `json:"encryptedPrivateKey"`
 }
 
-func GeneratePhrase(w http.ResponseWriter, r *http.Request) {
+func Register(w http.ResponseWriter, r *http.Request) {
 	var requestBody SignUpRequestBody
 
 	if err := readRequestBody(r, &requestBody); err != nil {

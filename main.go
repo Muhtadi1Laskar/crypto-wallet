@@ -24,7 +24,7 @@ func enableCORS(h http.Handler) http.Handler {
 func main() {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/generatePhrase", handlers.GeneratePhrase)
+	mux.HandleFunc("/register", handlers.Register)
 	fmt.Println("Server running on 5000")
 	http.ListenAndServe(":5000", enableCORS(mux))
 }

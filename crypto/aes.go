@@ -69,6 +69,12 @@ func AESDecrypt(cipherTextHex, secretKey string) (string, error) {
 	return string(plainText), nil
 }
 
+func DeriveAESKey(password string) string {
+	salt := []byte("A_SALT")
+	aesKey := pbkdf2.Key([]byte(password), salt, 2048, 32, sha256.New)
+	return string(aesKey)
+}
+
 func transformKey(key string) ([]byte, error) {
 	salt := []byte("Some-random-salt")
 	iterations := 10000
